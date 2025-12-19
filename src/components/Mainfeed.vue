@@ -155,14 +155,20 @@ class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100"
 <!-- Location Popup Modal -->
 
 
-<!-- Upload Post  -->
-
-<label class="cursor-pointer" title="Upload Media">
-<Icon icon="mdi:image-outline" class="w-5 h-5" />
-<input type="file" accept="image/*,video/*" multiple class="hidden" @change="handleFileUpload" />
+<!-- Upload Post -->                                                                                                                   <!-- Upload Post -->
+<label class="cursor-pointer " title="Upload Media">
+  <Icon icon="mdi:image-outline" class="w-5 h-5" />
+  <input
+    type="file"
+    accept="image/*,video/*"
+    multiple
+    class="hidden"
+    @change="handleFileUpload($event)"
+  />
 </label>
 
-<!-- Comment -->
+
+<!-- Comment -->                                                     
 <button @click="toggleReplyComment" title="Comment">
 <Icon icon="iconamoon:comment" class="w-5 h-5 " />
 </button>
@@ -192,7 +198,7 @@ class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100"
 <div class="relative max-w-3xl w-full max-h-[90vh]">
 <button
 @click="closePreview"
-class="fixed top-6 right-6 z-50 text-white bg-black bg-opacity-50 p-2 rounded-full hover:bg-opacity-70">
+class="fixed top-6 right-6 z-50 text-white bg-black bg-opacity-50   p-2 rounded-full hover:bg-opacity-70">
 
 <Icon icon="mdi:close" class="w-6 h-6" />
 </button>
@@ -382,48 +388,58 @@ v-if="showSettings"
 
 <!--  Stories Container -->
 <div
-ref="storyScrollRef"
-class="flex items-center gap-5 overflow-x-auto scroll-smooth no-scrollbar relative ">
-<div
-v-for="(story, i) in stories"
-:key="story.id"
-@click="openStory(i)" >
-<img
-:src="story.media"
-class="w-20 h-20 rounded-full border-2 border-purple-600 object-cover " />
-<span class="text-xs mt-2 mb-2 text-gray-600  truncate w-20 text-center">
-{{ story.username }}
-</span>
-</div>
-</div>
+  
+    ref="storyScrollRef"
+    class="flex gap-4 overflow-x-auto scroll-smooth px-2 no-scrollbar" >
+    <div
+      v-for="(story, i) in stories"
+      :key="story.id"
+      @click="openStory(i)"
+      class="flex flex-col items-center flex-shrink-0 w-[90px]">
+      <!-- Gradient Border -->
+      <div
+        class="w-20 h-20 rounded-xl p-[2px]
+               bg-gradient-to-tr from-purple-500 to-pink-500">
+        <img
+          :src="story.media"
+          class="w-full h-full rounded-lg object-cover bg-white"/>
+      </div>
 
-<!-- Left Arrow -->
-    <button
-      @click="scrollStories('left')"
-      class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white shadow p-1 rounded-full z-10">
-      <Icon icon="ic:round-chevron-left" class="w-5 h-5" />
-    </button>
-
- <!-- Right Arrow -->
-  <button
-   @click="scrollStories('right')"
-  class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white shadow p-1 rounded-full z-10" >
-  <Icon icon="ic:round-chevron-right" class="w-5 h-5" />
-  </button>
+      <span
+        class="text-xs mt-2 text-gray-700 truncate w-full text-center">
+        {{ story.username }}
+      </span>
+    </div>
   </div>
+
+  <!-- Left Arrow -->
+  <button
+    @click="scrollStories('left')"
+    class="absolute left-1 top-1/2 -translate-y-1/2
+           bg-white shadow rounded-full p-1 z-10">
+    <Icon icon="ic:round-chevron-left" class="w-5 h-5" />
+  </button>
+
+  <!-- Right Arrow -->
+  <button
+    @click="scrollStories('right')"
+    class="absolute right-1 top-1/2 -translate-y-1/2
+           bg-white shadow rounded-full p-1 z-10">
+    <Icon icon="ic:round-chevron-right" class="w-5 h-5" />
+  </button>
+</div>
+
 <!-- Post a Composer 1 -->
 
 
 
-<!--End Post a Composer 1 -->
- 
   <!--Main  Post Composer 2 -->
 <div v-for="(post, index) in posts" :key="post.id" class="bg-white border rounded-sl shadow-sm p-4  relative  ">
    <!-- Post Header -->
    <div class="flex items-center justify-between mb-2">
 
 
-  <!-- Avatar + User Info -->
+  <!-- Avatar / User Info -->
 <div class="flex items-center gap-2 ">
 <img
 :src="post.avatar"
@@ -519,7 +535,7 @@ class="w-10 h-10 rounded-full border border-gray-200 object-cover shadow-sm"/>
 
 
 
-    <!-- Caption or Editable -->
+<!-- Caption or Editable -->
   <div class="mb-4">
   <div v-if="editingIndex === index">
         <input v-model="editedCaption" class="w-full border px-3 py-1 rounded focus:outline-none" />
@@ -654,12 +670,13 @@ class="bg-white rounded-xl p-4 w-[420px] relative"
 
 <div class="flex justify-between items-center mb-3">
 <h2 class="text-lg font-bold">iFeed</h2>
-<button @click="closePopup" class="text-gray-500 hover:text-black">✕</button>
+<button @click="closePopup" class="text-gray-500 hover:text-black"> 
+<Icon icon="ri:close-line"/></button>
 </div>
 
-<!-- Post Input -->
+<!-- Post Input -->                                                                                                                                        <!-- Repost Button  -->
 <div class="flex items-center space-x-3 mb-4">
-<img src="your-avatar.jpg" class="w-10 h-10 rounded-full" />
+<img :src="currentUser.avatar" class="w-10 h-10 rounded-full" />
 <input type="text" placeholder="Write something..." class="flex-1 border rounded px-2 py-1" />
 </div>
 
@@ -672,6 +689,7 @@ class="bg-white rounded-xl p-4 w-[420px] relative"
 </div>
 
 <!-- Share To -->
+ 
 <div>
 <p class="font-semibold mb-1">Share To</p>
 <div class="flex space-x-4">
@@ -697,69 +715,81 @@ class="bg-white rounded-xl p-4 w-[420px] relative"
 </div>
 </teleport>
 </div>
-
+        
 <!-- Share Button and Dropdown -->
 
-
-
 <div class="relative">
-    <button
-    @click="toggleSharePopup(index)"
-    class="flex items-center gap-1 hover:text-green-600">
-    <Icon icon="mage:direction-up-right-2" class="w-5 h-5"/>
-    </button>
-<!-- Share Popup -->
+<button 
+@click.stop="showRepostPopup = true" 
+ class="p-2 hover:text-gray-500 relative z-10  duration-100">
+<Icon icon="mage:direction-up-right-2" class="w-5 h-5"/> <!-- Air Plan Share Popup -->
+</button>
 
+<!-- Teleported Popup -->
+<teleport to="body">
+<div 
+ v-if="showRepostPopup" 
+class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+@click="closePopup">
+<!-- Popup Content -->
+<div 
+class="bg-white rounded-xl p-4 w-[420px] relative"
+@click.stop>
+<!-- Header -->
 
-
-
-  <div
-    v-if="post.showShare"
-    :ref="el => sharePopupRefs[index] = el"
-    class="absolute right-0 bg-white border rounded-xl shadow-lg z-50 w-52 mt-2 p-3">
-    
-    <ul class="text-sm text-gray-700">
-      <li
-        class="hover:text-black cursor-pointer flex items-center gap-2 mb-2"
-        @click="openSendModal">
-        
-        <Icon icon="hugeicons:sent-02" class="w-4 h-4  text-indigo-500" />
-        Sent  Friend
-      </li>
-      <li
-        class="hover:text-black cursor-pointer flex items-center gap-2 mb-2"
-        @click="copyLink">
-        <Icon icon="material-symbols:link" class="w-5 h-5" />
-        Copy Link
-      </li>
-      <li
-        class="hover:text-black cursor-pointer flex items-center gap-2 mb-2"
-        @click="shareToFacebook"
-      >
-        <Icon icon="logos:facebook" class="w-5 h-5 text-blue-600" />
-        Facebook
-      </li>
-      <li
-        class="hover:text-black cursor-pointer flex items-center gap-2 mb-2"
-        @click="shareToTelegram"
-      >
-        <Icon icon="logos:telegram" class="w-5 h-5 text-sky-500" />
-        Telegram
-      </li>
-      <li
-        class="hover:text-black cursor-pointer flex items-center gap-2"
-        @click="shareToMessenger">
-
-        <Icon icon="logos:messenger" class="w-5 h-5 text-indigo-500" />
-        Messenger
-      </li>
-    </ul>
+<div class="flex justify-between items-center mb-3">
+<h2 class="text-lg font-bold">iFeed</h2>
+<button @click="closePopup" class="text-gray-500 hover:text-black"> 
+<Icon icon="ri:close-line"/></button>
 </div>
+
+<!-- Post Input -->                                                                                                                                        <!-- Repost Button  -->
+<div class="flex items-center space-x-3 mb-4">
+<img :src="currentUser.avatar" class="w-10 h-10 rounded-full" />
+<input type="text" placeholder="Write something..." class="flex-1 border rounded px-2 py-1" />
+</div>
+
+<!-- Sent to Friend -->
+<div class="mb-4">
+<p class="font-semibold mb-1">Sent to Friend</p>
+<div class="flex space-x-2">
+<img v-for="(friend, index) in friends" :key="index" :src="friend" class="w-10 h-10 rounded-full" />
 </div>
 </div>
 
+<!-- Share To -->
+ 
+<div>
+<p class="font-semibold mb-1">Share To</p>
+<div class="flex space-x-4">
+<button class="flex flex-col items-center text-sm">
+<Icon icon="ri:link" class="w-10 h-10"/>
+<span>Copy</span>
+</button>
+<button class="flex flex-col items-center text-sm">
+  <Icon icon="logos:telegram" class="w-10 h-10"/>
+<span>Telegram</span>
+</button>
+<button class="flex flex-col items-center text-sm">
+  <Icon icon="logos:facebook" class="w-10 h-10"/>
+<span>Facebook</span>
+</button>
+<button class="flex flex-col items-center text-sm item-center">
+<Icon icon="tdesign:chat-bubble" class="w-10 h-10 text-white transition-colors bg-green-500 border-4 border-green-500 rounded-xl duration-200 hover:text-gray-600"/>
+<span>iFeed</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</teleport>
 
 
+</div>
+</div>
+
+
+ 
 
 
 
@@ -862,7 +892,7 @@ v-for="user in suggestedUsers"
   </li>
   </ul>
   
-<!-- 🟢 Add Copyright Box -->
+<!--  Add Copyright Box -->
 <div class=" mt-8 text-center text-xs text-gray-400">
   © 2025 iFeed. All rights reserved.
   TeamDev.Sihanouk Ville City.Cambodia 
@@ -978,9 +1008,6 @@ v-bind="activeStory.type === 'video'? { autoplay: true, muted: true, loop: true,
 
 
 
-
-
-
   <!--  -->
 
 
@@ -1009,6 +1036,8 @@ export default {
   },
   data() {
     return {
+      media:[], //store uplouad post
+      currentIndex:0,  // for slide post 
       newPost: '',
       showEmojiPicker: false,
       mediaPreviews: [],
@@ -1022,6 +1051,7 @@ export default {
       sharePopupRefs: [],
       showShareModal: false,
       activeSharedPostIndex: null,
+
       showLocation: false,
       postLocation: '',
       replyCommentVisible: false,
@@ -1035,9 +1065,9 @@ export default {
       showLocationPopup: false,
       locationInput: '',
       suggestions: [
-        { name: 'Phnom Penh', desc: 'Cambodia' },
-        { name: 'Siem Reap', desc: 'Angkor Wat' },
-        { name: 'Kampot', desc: 'Riverside town' },
+      { name: 'Phnom Penh', desc: 'Cambodia' },
+      { name: 'Siem Reap', desc: 'Angkor Wat' },
+      { name: 'Kampot', desc: 'Riverside town' },                                              //Location Limit
       ],
       locationInputRef: null,
       tags: [],
@@ -1046,21 +1076,21 @@ export default {
       filteredUsers: [],
       textareaRef: null,
       users: [
-        { name: 'sinayun' },
-        { name: 'nayun' },
-        { name: 'nita_lovekhmer' },
-        { name: 'chakriya' },
-        { name: 'konkhmer' },
+      { name: 'sinayun' },
+      { name: 'nayun' },
+      { name: 'nita_lovekhmer' },
+      { name: 'chakriya' },
+      { name: 'konkhmer' },
       ],
       showFollowerPopup: false,
       activeTab: 'followers',
       followers: [
-        { name: 'story5', avatar: '/images/default-avatar.jpg' },
-        { name: 'story3', avatar: '/images/default-avatar.jpg' },
+      { name: 'story5', avatar: '/images/default-avatar.jpg' },
+      { name: 'story3', avatar: '/images/default-avatar.jpg' },
       ],
       following: [
-        { name: 'mini1', avatar: '/images/default-avatar.jpg' },
-        { name: 'mini3', avatar: '/images/default-avatar.jpg' },
+      { name: 'mini1', avatar: '/images/default-avatar.jpg' },
+      { name: 'mini3', avatar: '/images/default-avatar.jpg' },
       ],
       showPostModal: false,
       showChatPopup: false,
@@ -1073,8 +1103,10 @@ export default {
         { id: 5, name: 'Kon_Khmer', time: '1:12 PM', avatar: story5 },
       ],
       showSettings: false,
-      showRepostPopup: false,
-      friends: ['friend1.jpg', 'friend2.jpg', 'friend3.jpg'],
+      showRepostPopup: false, 
+       friends: ['friend1.jpg', 'friend2.jpg', 'friend3.jpg'],                                                   //Show repost 
+      showSharePopup: false,                                                                        
+  
       replyText: '',
       stories: [
         { id: 1, username: 'user_1', media: story1, type: 'image', time: '1h ago' },
@@ -1127,7 +1159,12 @@ export default {
       ],
     };
   },
+
+  
+  //Method 
   methods: {
+
+    
     handleTouchStart(e) {
       this.touchStartX = e.changedTouches[0].screenX;
     },
@@ -1184,20 +1221,22 @@ export default {
         container.scrollLeft += direction === 'right' ? amount : -amount;
       }
     },
-    handleFileUpload(e) {
-      const files = Array.from(e.target.files);
-      this.mediaPreviews = files.map((file) => ({
-        url: URL.createObjectURL(file),
-        type: file.type,
-      }));
-    },
-    handleDrop(e) {
-      const files = Array.from(e.dataTransfer.files);
-      this.mediaPreviews = files.map((file) => ({
-        url: URL.createObjectURL(file),
-        type: file.type,
-      }));
-    },
+ handleFileUpload(e) {
+  const files = Array.from(e.target.files);
+  this.mediaPreviews = files.map((file) => ({
+    url: URL.createObjectURL(file),
+    type: file.type,
+  }));
+},
+handleDrop(e) {
+  const files = Array.from(e.dataTransfer.files);
+  this.mediaPreviews = files.map((file) => ({
+    url: URL.createObjectURL(file),
+    type: file.type,
+  }));
+},
+
+   
     addEmoji(emoji) {
       this.newPost += emoji.i;
       this.showEmojiPicker = false;
@@ -1280,7 +1319,6 @@ export default {
 
 
   //Location
-
     getLocation() {
       this.showLocationPopup = true;
       if (navigator.geolocation) {
