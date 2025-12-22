@@ -76,7 +76,7 @@ function handleKeydown(e, i) {
 async function verifyCode() {
   const fullCode = digits.value.join('')
   
-  const response = await fetch('https://your-render-url.onrender.com/verify-code', {
+  const response = await fetch('https://digit-backend-1b5i.onrender.com/verify-code', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: contact.value, code: fullCode })
@@ -86,14 +86,14 @@ async function verifyCode() {
 
   if (result.success) {
     alert('✅ Verified!')
-    router.push('/feed')
+    router.push('/profile')
   } else {
     error.value = 'Invalid code. Try again.'
   }
 }
 
 function resendCode() {
-  fetch('https://your-render-url.onrender.com/send-code', {
+  fetch('https://digit-backend-1b5i.onrender.com/send-code', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: contact.value })
