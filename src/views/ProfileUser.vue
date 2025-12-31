@@ -1,16 +1,14 @@
 <template>
-  <div class="min-h-screen bg-white-500 flex">
+<div class="min-h-screen bg-white-500 flex">
     <!-- Sidebar -->
-    <aside class="w-35 bg-white p-6 border-r hidden lg:flex flex-col">
-      <h1 class="text-4xl font-bold text-green-600 mb-6">
-        
-      <button @click="goToMainfeed">
-      iFeed
-    </button>
-    </h1>
-    </aside>
+<aside class="w-35 bg-white p-6 border-r hidden lg:flex flex-col">
+<button class="flex-1 flex-col items-center text-sm item-center">
+<Icon icon="tdesign:chat-bubble" class="w-10 h-10 text-white transition-colors bg-green-500 border-4 border-green-500 rounded-xl duration-200 hover:text-gray-600" 
+ @click="goToMainfeed"/>
+</button>
+</aside>
 
-    <!-- Profile Section -->
+<!-- Profile Section -->
     <div class="flex-1 max-w-xl mx-auto bg-white p-6">
       <!-- Header -->
       <div class="flex justify-between items-start mb-4">
@@ -18,10 +16,17 @@
           <h2 class="font-bold">{{ currentUser.name }}</h2>
           <p class="text-xs text-gray-500">{{ currentUser.role }}</p>
         </div>
+
+        
         <div class="flex items-center gap-4">
           <button @click="showEditModal =true">
-          <Icon icon="mynaui:edit-one" class="w-5 h-5" /></button>
-          <button><Icon icon="mdi:heart-outline" class="w-5 h-5" /></button>
+          <Icon icon="mynaui:edit-one" class="w-5 h-5" />
+        </button>
+
+
+          <button>
+          <Icon icon="mdi:heart-outline" class="w-5 h-5" />
+          </button>
           
           <!-- Avatar Upload Trigger -->
           <label class="cursor-pointer relative">
@@ -31,7 +36,7 @@
         </div>
       </div>
 
-      <!-- Bio & Stats -->
+<!-- Bio & Stats -->
 <p class="text-sm mb-2">Life is struggle love yourself.</p>
 
 
@@ -54,6 +59,7 @@
 <Icon icon="ri:close-line"/>
 </button>
 <h2 class="text-xl font-medium-bold mb-4">Followers</h2>
+
 
 <!-- Tabs -->
 <div class="flex border-b mb-4">
@@ -210,6 +216,9 @@ import axios from 'axios'
 
 
 
+
+
+
 export default {
   name: 'ProfilePage',
   components: {
@@ -218,7 +227,7 @@ export default {
 
   data() {
     return {
-       // 👇 ADD THESE (Follower Popup)
+       // ADD THESE (Follower Popup)
     showFollowerPopup: false,
     activeTab: 'followers',
     followers: [
@@ -252,6 +261,7 @@ export default {
   },
 
   methods: {
+    
     toggleFollowerPopup(){
       this.showFollowerPopup = !this.showFollowerPopup
     },
@@ -259,7 +269,6 @@ export default {
     this.activeTab = tab
   },
 
-  // ─────────────────────────
   // existing methods below
   onAvatarChange(event) {
     const file = event.target.files[0]

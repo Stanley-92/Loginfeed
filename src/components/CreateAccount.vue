@@ -41,10 +41,10 @@
           :class="[
             'flex-1 border text-xs px-2 py-2 rounded-md',
             form.gender === g ? 'border-green-500 bg-green-100' : 'border-gray-400'
-          ]"
-        >
+          ]">
           {{ g }}
         </button>
+
       </div>
       <p v-if="errors.gender" class="text-red-500 text-xs mb-2">{{ errors.gender }}</p>
 
@@ -67,111 +67,94 @@
   </div>
 </template>
 
-<script setup>
-import { reactive } from 'vue'
-import { useRouter } from 'vue-router'
 
-// ✅ Firebase Auth
+
+<script>
 import { auth } from '@/firebase'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
- 
 
-const router = useRouter()
+export default {
+  name: 'CreateAccount',
 
-const form = reactive({
-  firstName: '',
-  lastName: '',
-  dobDay: '',
-  dobMonth: '',
-  dobYear: '',
-  gender: '',
-  contact: '',
-  password: '',
-})
+  data() {
+    return {
+      form: {
+        firstName: '',
+        lastName: '',
+        dobDay: '',
+        dobMonth: '',
+        dobYear: '',
+        gender: '',
+        contact: '',
+        password: ''
+      },
+      errors: {
+        name: '',
+        dob: '',
+        gender: '',
+        contact: '',
+        password: ''
+      },
+      years: Array.from({ length: 100 }, (_, i) => `${new Date().getFullYear() - i}`)
+    }
+  },
 
-const errors = reactive({
-  name: '',
-  dob: '',
-  gender: '',
-  contact: '',
-  password: ''
-})
+  methods: {
+    async handleSubmit() {
+      // Reset errors
+      this.errors.name = ''
+      this.errors.dob = ''
+      this.errors.gender = ''
+      this.errors.contact = ''
+      this.errors.password = ''
 
-const years = Array.from({ length: 100 }, (_, i) => `${new Date().getFullYear() - i}`)
+      // Validation
+      if (!this.form.firstName || !this.form.lastName) this.errors.name = 'First and Last name are required.'
+      if (!this.form.dobDay || !this.form.dobMonth || !this.form.dobYear) this.errors.dob = 'Complete date of birth is required.'
+      if (!this.form.gender) this.errors.gender = 'Please select a gender.'
 
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      const phoneRegex = /^[0-9]{6,15}$/
+      if (!this.form.contact || (!emailRegex.test(this.form.contact) && !phoneRegex.test(this.form.contact)))
+        this.errors.contact = 'Enter a valid email or phone number.'
 
+      if (!this.form.password || this.form.password.length < 6)
+        this.errors.password = 'Password must be at least 6 characters.'
 
+      // Proceed if valid
+      if (!this.errors.name && !this.errors.dob && !this.errors.gender && !this.errors.contact && !this.errors.password) {
+        if (emailRegex.test(this.form.contact)) {
+          try {
+            // Firebase create user
+            await createUserWithEmailAndPassword(auth, this.form.contact, this.form.password)
 
+            // Save email to localStorage for Verify.vue
+            localStorage.setItem('verifyEmail', this.form.contact)
 
+            // Call backend to send verification code
+            const res = await fetch('http://localhost:3001/send-code', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: this.form.contact })
+            })
+            const data = await res.json()
 
+            if (data.success) {
+              // Redirect to Verify page
+              this.$router.push({ path: '/verify' })
+            } else {
+              this.errors.contact = data.message || 'Failed to send verification code.'
+            }
 
-async function handleSubmit() {
-  // Reset errors
-  errors.name = ''
-  errors.dob = ''
-  errors.gender = ''
-  errors.contact = ''
-  errors.password = ''
-
-  // Name validation
-  if (!form.firstName || !form.lastName) {
-    errors.name = 'First and Last name are required.'
-  }
-
-  // DOB validation
-  if (!form.dobDay || !form.dobMonth || !form.dobYear) {
-    errors.dob = 'Complete date of birth is required.'
-  }
-
-  // Gender validation
-  if (!form.gender) {
-    errors.gender = 'Please select a gender.'
-  }
-
-  // Contact validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  const phoneRegex = /^[0-9]{6,15}$/
-  if (!form.contact || (!emailRegex.test(form.contact) && !phoneRegex.test(form.contact))) {
-    errors.contact = 'Enter a valid email or phone number.'
-  }
-
-  // Password validation
-  if (!form.password || form.password.length < 6) {
-    errors.password = 'Password must be at least 6 characters.'
-  }
-
-  // ✅ Proceed if all valid
-  if (!errors.name && !errors.dob && !errors.gender && !errors.contact && !errors.password) {
-    if (emailRegex.test(form.contact)) {
-      try {
-        // ✅ Firebase Registration
-        await createUserWithEmailAndPassword(auth, form.contact, form.password)
-
-        // ✅ Call Backend to Send Verification Code Email
-      await fetch('https://digit-backend-1b5i.onrender.com/send-code', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email: form.contact })
-});
-
-        // Save email for verification screen
-        localStorage.setItem('verifyEmail', form.contact)
-
-        // Redirect to Verify Page
-        router.push('/verify')
-
-      } catch (err) {
-        errors.contact = 'Account already exists or invalid email.'
-        console.error(err.message)
+          } catch (err) {
+            this.errors.contact = 'Account already exists or invalid email.'
+            console.error(err.message)
+          }
+        } else {
+          this.errors.contact = 'Phone signup not supported yet.'
+        }
       }
-    } else {
-      errors.contact = 'Phone signup not supported yet.'
     }
   }
 }
-
-
-
-
-
 </script>

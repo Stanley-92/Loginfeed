@@ -24,7 +24,7 @@ class="w-full border border-gray-300 rounded-full px-4 py-2 pl-10 text-sm focus:
 <Icon icon="mdi:magnify" class="absolute left-7 top-2.5 text-gray-400 w-4 h-4" />
 </div>
 
-<!-- FRIEND LIST or CHAT THREAD VIEW -->
+<!-- FRIEND LIST or CHAT THREAD VIEW --> 
   <div v-if="!chatStarted" class="space-y-3 overflow-y-auto px-4">
   <div
   v-for="friend in filteredFriends"
@@ -98,7 +98,7 @@ class="max-w-[70%] flex flex-col gap-1"
 <!-- Audio Message -->
 <div
   v-if="msg.audio"
-  class="flex flex-col transition-transform duration-200 max-w-[70%]"
+  class="flex flex-col transition-transform duration-200 max-w-[70%] "
   :style="{ transform: swipeTranslateX(index) }"
   :class="msg.from === 'me' ? ' items-end self-end' : 'items-start self-start '" 
   @touchstart="onTouchStart"
@@ -243,7 +243,7 @@ class="text-gray-500 hover:text-red-500 transition"
 
     <!-- Emoji -->
     <button @click="toggleEmojiPicker" title="Insert Emoji">
-      <Icon icon="fa-regular:smile" class="w-5 h-5 text-gray-500 hover:text-yellow-500" />
+    <Icon icon="fa-regular:smile" class="w-5 h-5 text-gray-500 hover:text-yellow-500" />
     </button>
 
     <!-- File Attach -->
@@ -382,13 +382,11 @@ function sendMessage() {
     const now = new Date()
     const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
-    const sentText = newMessage.value.trim()
-
     messages.value.push({
-      text: sentText,
+      text: newMessage.value.trim(),
       from: 'me',
-      user: 'sinayun_xyn',
-      avatar: sinayun,
+      user: currentUser.value.name,
+      avatar: currentUser.value.avatar,
       time,
       date: getFormattedDate(now)
     })
@@ -396,18 +394,7 @@ function sendMessage() {
     newMessage.value = ''
     scrollToBottomSmart()
 
-    setTimeout(() => {
-      const botNow = new Date()
-      messages.value.push({
-        text: mockBotReply(sentText),
-        from: 'them',
-        user: 'Konsreypov',
-        avatar: story4,
-        time: botNow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        date: getFormattedDate(botNow)
-      })
-      scrollToBottomSmart()
-    }, 1000)
+    // Remove bot reply completely
   }
 }
 
@@ -435,12 +422,7 @@ function scrollToBottomSmart() {
   })
 }
 
-// Dummy bot reply
-function mockBotReply(message) {
-  if (message.toLowerCase().includes('hello')) return 'Hi there!'
-  if (message.toLowerCase().includes('how are you')) return 'I am fine, thanks!'
-  return 'Konsreypov: ' + message
-}
+
 
 // File handlers (optional)
 function handleMediaUpload(e) {

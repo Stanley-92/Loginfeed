@@ -5,32 +5,35 @@
 
 <!-- Left Sidebar -->
 <aside
-  class="w-25 bg-white border-2 p-6 hidden md:block sticky top-0 h-[100dvh]">
-<h1 class="text-4xl font-bold text-green-500 mb-4 cursor-pointer" @click="goToMainfeed">iFeed</h1>
+class="w-25 bg-white border-2 p-6 hidden md:block sticky top-0 h-[100dvh]">
 
-
+<button class="flex-1 flex-col items-center text-sm item-center mt-4  inset-y-0 left-0 flex items-center pl-3 cursor-pointer ">
+<Icon icon="tdesign:chat-bubble" class="w-10 h-10 text-white transition-colors bg-green-500 border-4 border-green-500 rounded-xl duration-200 hover:text-gray-600 mb-10" 
+ @click="goToMainfeed"/>
+</button>
 
 <div class="relative mb-65">
 <div 
-class="flex-1 inset-y-0 left-0 flex items-center pl-3 cursor-pointer"
+class="flex-1 inset-y-0 left-0 flex items-center pl-3  cursor-pointer"
  @click="handleSearch">
 <!-- Search Icon -->
  <button
-    @click="toggleSearch"
-    class="p-2 rounded-full hover:bg-gray-100 z-50">
-    <Icon icon="solar:magnifer-outline" class="w-6 h-6 text-gray-600 " />
+  @click="toggleSearch"
+  class="relative z-50 p-2 hover:bg-gray-100 rounded-xl"> <!---Hover Style background icon -->
+  <Icon icon="solar:magnifer-outline" class="w-6 h-6 text-gray-600  " />
   </button>
-
-
 </div>
+
+
+
  <!-- Search Input -->
- <input
+<input
   type="text"
   v-model="searchQuery"
   placeholder="Search"
-  class="absolute left-10 top-1/2 -translate-y-1/2
-         w-15 bg-white border border-gray-300
-         rounded-xl px-4 py-2 text-sm
+  class="absolute left-12 top-1/2 -translate-y-1/2
+         w-40 bg-white border border-gray-300
+         rounded-xl pl-10 pr-4 py-2 text-sm
          shadow-md z-40
          transition-all duration-300 ease-out
          focus:outline-none focus:ring-2 focus:ring-green-300"
@@ -38,14 +41,16 @@ class="flex-1 inset-y-0 left-0 flex items-center pl-3 cursor-pointer"
     ? 'opacity-100 translate-x-0 pointer-events-auto'
     : 'opacity-0 -translate-x-6 pointer-events-none'"
   @keyup.enter="handleSearch"
-  @blur="closeIfEmpty"/>
+  @blur="closeIfEmpty"
+/>
+
 
   <!-- Search Results -->
 <div
   v-if="showResults && filteredSearchUsers.length"
   class="absolute top-14 left-0 w-72 bg-white
          border rounded-xl shadow-lg z-50
-         max-h-72 overflow-y-auto">
+         max-h-95 overflow-y-auto">
 
   <div
     v-for="user in filteredSearchUsers"
@@ -64,22 +69,25 @@ class="flex-1 inset-y-0 left-0 flex items-center pl-3 cursor-pointer"
 </div>
 
 
-</div>
-<nav class="space-y-2 px-3  py-8  text-gray-700 gap-3">
-<div class="flex items-center gap-3 p-2 cursor-pointer  hover:text-blue-500">
 
+
+</div>
+<nav class="space-y-2 px-3  py-14 text-gray-700 gap-3">
+<div 
+
+class="relative z-50 p-3   hover:bg-gray-200 rounded-xl"> <!---Hover Style background -->
 <!---Home icon-->
 <Icon icon="material-symbols:home" class="w-8 h-8 text-gray-500 transition-colors duration-200 hover:text-gray-600"/>  <!---Home-->
 </div>
 
   <button
-    @click="showNotify = true"
+  @click="showNotify = true"
 
-  class="relative z-50 p-3 hover:bg-gray-100 rounded-xl">
+  class="relative z-50 p-3 hover:bg-gray-200 rounded-xl">
 <!---Heart icon-->
 <Icon icon="solar:heart-outline" class="w-8 h-8 text-gray-500 transition-colors duration-200 hover:text-gray-600"/>
 <span v-if="notifications.length > 0" class="absolute top-0 right-0 -mt-1 -mr-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-  {{ notifications.length }}
+{{ notifications.length }}
 </span>
 </button>
 
@@ -91,15 +99,14 @@ class="flex-1 inset-y-0 left-0 flex items-center pl-3 cursor-pointer"
 
 
 
-  <!-- Reusable Notification Popup  -->
+<!-- Reusable Notification Popup  -->
   <Notify
     v-model="showNotify"
     :notifications="notifications"/> 
 
-
-
-
-<div @click="openPostModal"  class="w-10 h-10 flex items-center  justify-center   border-gray-300 ">
+ 
+<div @click="openPostModal" 
+ class="relative z-40 p-2 hover:bg-gray-200 rounded-xl">
 <!-- Plus icon -->
 <Icon icon="ic:baseline-plus" class="w-10 h-10 text-gray-500 transition-colors bg-green-300    border-2 border-blue-200 rounded-xl duration-200 hover:text-gray-600" /> 
 </div> 
@@ -248,16 +255,23 @@ class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100"
 <button @click="toggleReplyComment" title="Comment">
 <Icon icon="iconamoon:comment" class="w-5 h-5 " />
 </button>
-
 <!-- Emoji Picker -->
-<div class="relative" title="Insert Emoji">
-<button @click="toggleEmojiPicker">
-<Icon icon="mdi:emoticon-outline" class="w-5 h-5 mr-5 mt-2" />
-</button>
-<div v-if="showEmojiPicker" class="absolute z-50 top-8 right-0">
-<EmojiPicker @select="addEmoji" />
+<div class="relative" ref="emojiWrapper">
+  <button
+    @click.stop="toggleEmojiPicker('composer')"
+    title="Emoji">
+  <Icon icon="mingcute:emoji-line" class="w-5 h-5 mr-5 mt-2" />
+  </button>
+
+  <div
+    v-if="showEmojiPickerIndex === 'composer'"
+    class="absolute z-50 top-8 right-0"
+    @click.stop>
+    <EmojiPicker @select="EmojiToPost" />
+  </div>
 </div>
-</div>
+
+
 <!-- Post -->
 <button class="text-sm font-semibold text-gray-700 hover:text-blue-600" @click="submitPost(); showPostModal = false">
  Post
@@ -271,6 +285,8 @@ class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100"
 <button
 @click="closePreview"
 class="fixed top-6 right-6 z-50 text-white bg-black bg-opacity-50   p-2 rounded-full hover:bg-opacity-70">
+
+
 
 <Icon icon="mdi:close" class="w-6 h-6" />
 </button>
@@ -319,19 +335,19 @@ class="relative">
 
 </nav>
 
-<div class="mt-8 relative">
-
+<div class="mt-40 mb-5 relative">
   <!-- Settings Icon -->
   <div 
     @click="toggleSettings"  
-    class="flex items-center gap-8 p-4 cursor-pointer hover:text-blue-500 mb-8">
-  <Icon icon="famicons:reorder-three-outline" class="w-8 h-8 transition-colors duration-200 " />
+    class="relative z- hover:bg-gray-200 rounded-xl">
+  <Icon icon="famicons:reorder-three-outline"  class="w-8 h-8 text-gray-500 transition-colors duration-200 hover:text-gray-600"/>  <!---Setting-->
   </div>
  </div>
 </aside>   
+
+
+
  <div>
-
-
 <!-- Settings Popup -->
 <teleport to="body">
   <!-- Overlay (click outside) -->
@@ -482,14 +498,13 @@ class="w-10 h-10 rounded-full border border-gray-200 object-cover shadow-sm"/>
   <button
     type="button"
     @click.stop="toggleMenu(index)"
-    class="p-1 hover:bg-gray-100 rounded-full"
->
-    <Icon icon="bi:three-dots" class="w-5 h-5 text-gray-600" />
+    class="p-1 hover:bg-gray-100 rounded-full">
+  <Icon icon="bi:three-dots" class="w-5 h-5 text-gray-600" />
   </button>
 
   <!-- Dropdown Menu -->
   <div
-    v-if="activeMenuIndex === index"
+  v-if="activeMenuIndex === index"
   class="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
     <ul class="text-sm text-gray-700 py-2">
 
@@ -733,7 +748,8 @@ class="bg-white rounded-xl p-4 w-[420px] relative"
 <span>Facebook</span>
 </button>
 <button class="flex flex-col items-center text-sm item-center">
-<Icon icon="tdesign:chat-bubble" class="w-10 h-10 text-white transition-colors bg-green-500 border-4 border-green-500 rounded-xl duration-200 hover:text-gray-600"/>
+<Icon icon="tdesign:chat-bubble"
+ class="w-10 h-10 text-white transition-colors bg-green-500 border-4 border-green-500 rounded-xl duration-200 hover:text-gray-600"/>
 <span>iFeed</span>
 </button>
 </div>
@@ -745,7 +761,7 @@ class="bg-white rounded-xl p-4 w-[420px] relative"
  
 
 </div>
- 
+
 
 </div>
 </div>
@@ -775,17 +791,65 @@ class="bg-white rounded-xl p-4 w-[420px] relative"
 
 
 
-<!-- Add New Comment Input "-->                            
+<!-- Add New Comment  "-->                            
 <div v-if="!post.commentsDisabled" class=" mt-2 flex gap-1 items-center ">
 <img :src="post.avatar" class="w-10 h-10 rounded-full border-2 " />
 
-<textarea
-v-model="post.newComment" 
-placeholder="Add a comment..." 
-class="flex-1 px-2 text-sm bg-gray-100 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 w-full  " 
-@input="autoResize($event)"
-@keyup.enter.exact="addCommentToPost(index)">
+<!-- Add New Comment Input "-->  
+<div class="relative flex items-end gap-2 w-full">
+
+  <textarea
+    v-model="post.newComment"
+    placeholder="Add a comment..."
+    class="flex-1 px-3 pr-24 py-2 text-sm bg-gray-100 rounded-xl resize-none
+           focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
+    @input="autoResize($event)"
+    @keyup.enter.exact.prevent="addCommentToPost(index)">
 </textarea>
+
+
+<!---Add Comment Media Emoji -->
+
+<button
+  class="absolute right-16 bottom-2 text-gray-500 hover:text-blue-500"
+  @click.stop="toggleEmojiPicker(index)">
+  <Icon icon="proicons:emoji" class="w-5 h-5 text-yellow-500" />
+</button>
+
+<!-- Emoji Picker -->
+<div
+  v-if="showEmojiPickerIndex === index"
+  class="absolute z-50 bottom-12 right-0"
+  @click.stop>
+<EmojiPicker @select="emoji => addEmojiToComment(emoji, index)" />
+</div>
+
+
+
+
+
+
+  <!-- Image Upload -->
+  <label
+    class="absolute right-10 bottom-2 cursor-pointer text-gray-500 hover:text-blue-500">
+    <Icon icon="tabler:photo" class="w-5 h-5"/>
+    <input
+      type="file"
+      accept="image/* video/*"
+      class="hidden"
+      @change="addCommentImage($event, index)"/>
+  </label>
+
+  <!-- Send Button -->
+  <button
+    type="button"
+    class="absolute right-3 bottom-2 text-blue-500 hover:text-blue-600"
+    @click="addCommentToPost(index)">
+    <Icon icon="famicons:paper-plane-outline" class="w-5 h-5"/>
+  </button>
+</div>
+
+
 </div>
 </div>
 </div>   
@@ -990,15 +1054,16 @@ import { nextTick } from 'vue';
 import { Icon } from '@iconify/vue';
 import EmojiPicker from 'vue3-emoji-picker';
 import 'vue3-emoji-picker/css';
-import CommentCard from './CommentCard.vue';
-import Notify from './Notify.vue';
-import ChatPanel from './ChatPanel.vue';
-import story1 from '@/assets/story1.jpg';
-import story2 from '@/assets/story2.jpg';
-import story3 from '@/assets/story3.jpg';
-import story4 from '@/assets/story4.jpg';
-import story5 from '@/assets/story5.jpg';
-import sinayun from '@/assets/jeny3.jpg';
+import CommentCard from '@/components/CommentCard.vue';
+import Notify from '@/components/Notify.vue';
+import ChatPanel from '@/components/ChatPanel.vue';
+import story1 from '@/assets/mini.jpg';
+import story2 from '@/assets/Khmer.jpg';
+import story3 from '@/assets/sinayun_xyn.jpg';
+import story4 from '@/assets/jena8.jpg';
+import story5 from '@/assets/story2.jpg';
+import sinayun from '@/assets/mini1.jpg';
+
 import aesp from '@/assets/aesp.jpg';
 
 
@@ -1031,7 +1096,7 @@ export default {
       media:[], //store uplouad post
       currentIndex:0,  // for slide post 
       newPost: '',
-      showEmojiPicker: false,
+      showEmojiPickerIndex: false,
       mediaPreviews: [],
       activeStory: null,
       currentStoryIndex: null,
@@ -1141,6 +1206,7 @@ export default {
           showComments: false,
           showShare: false,
           newComment: '',
+          commentMedia: [],
           commentsList: [],
           commentsDisabled: false,
         
@@ -1186,11 +1252,56 @@ computed: {
   //Method 
   methods: {
 
+
+    
+
+  //commment Uploaod Post
+ 
+ addCommentImage(event, index) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const post = this.posts[index];
+  if (!post.commentMedia) {
+    this.$set
+      ? this.$set(post, 'commentMedia', [])
+      : (post.commentMedia = []);
+  }
+
+  post.commentMedia.push({
+    url: URL.createObjectURL(file),
+    type: file.type
+  });
+
+  event.target.value = '';
+},
+
+
+
  getYouTubeId(url) {
     const regExp = /^.*((youtu.be\/)|(v\/)|(u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
     const match = url.match(regExp);
     return match && match[7].length === 11 ? match[7] : null;
   },
+
+  handleCommentMediaUpload(event, index) {
+  const files = Array.from(event.target.files)
+  const post = this.posts[index]
+
+  // SAFETY
+  if (!post.tempCommentMedia) {
+    this.$set(post, 'commentMedia', [])
+  }
+
+  files.forEach(file => {
+    post.tempCommentMedia.push({
+      url: URL.createObjectURL(file),
+      type: file.type.startsWith('video') ? 'video' : 'image'
+    })
+  })
+
+  event.target.value = ''
+},
   
   //Link post 
 
@@ -1393,14 +1504,36 @@ handleDrop(e) {
   }));
 },
 
-   
-    addEmoji(emoji) {
-      this.newPost += emoji.i;
-      this.showEmojiPicker = false;
+
+//Emoji Post 
+     togglePostEmojiPicker() {
+      this.showPostEmojiPicker = !this.showPostEmojiPicker
     },
-    toggleEmojiPicker() {
-      this.showEmojiPicker = !this.showEmojiPicker;
+
+    EmojiToPost(emoji) {
+      this.newPost += emoji.i
+      this.showPostEmojiPicker = false
     },
+
+
+toggleEmojiPicker(index) {
+  this.showEmojiPickerIndex = !this.showEmojiPickerIndex;
+  this.showEmojiPickerIndex =
+ 
+  this.showEmojiPickerIndex === index ? null : index;
+},
+//add Emoji commet
+addEmojiToComment(emoji, index) {
+  this.showEmojiPickerIndex === index ? null : index
+  if (!this.posts[index].newComment) {
+    this.posts[index].newComment = '';
+  }
+
+  this.posts[index].newComment += emoji.i;
+  this.showEmojiPickerIndex = null
+},
+
+
 
 
 // Submit Post 
@@ -1412,16 +1545,15 @@ handleDrop(e) {
 
   // Extract tags (@username)
   const extractedTags = this.newPost.match(/@\w+/g) || [];
-
-  // Create new post object
+// Create new post with previews (temporary solution)
   const newPostObj = {
     id: Date.now(),
     user: 'sinayun_xyn',
     avatar: this.currentUser.avatar,
     location: this.postLocation.trim(),
     caption: this.newPost,
-    media: [...this.mediaPreviews],
-    link: linkCopy, // store the link safely
+    media: this.mediaPreviews.map(preview => ({ ...preview })), // deep copy
+    link: linkCopy,
     tags: extractedTags,
     time: 'Just now',
     likes: 0,
@@ -1431,22 +1563,25 @@ handleDrop(e) {
     showComments: false,
     showShare: false,
     newComment: '',
+    commentMedia: [],
     commentsList: [],
     commentsDisabled: false,
   };
 
-  // Add new post at the top
   this.posts.unshift(newPostObj);
 
-  // Reset input fields
+  // Reset
   this.newPost = '';
-  this.mediaPreviews = [];
-  this.tags = [];
-  this.showEmojiPicker = false;
+  this.mediaPreviews = []; // ← clear previews
   this.postLocation = '';
-  this.showLocation = false;
   this.postLink = null;
+  this.showPostModal = false;
 },
+
+
+
+
+
     countTotalComments(comments) {
       let count = 0;
       for (const comment of comments) {
@@ -1476,12 +1611,15 @@ handleDrop(e) {
 
       post.commentsList.push({
         user: this.currentUser.name,
-        avatar: this.currentUser.avatar,
+        avatar: this.currentUser.avatar || this.defaultAvatar,
         text,
+        media: [...post.commentMedia],
+        time:'Just now',
         liked: false,
         replies: [],
       });
       post.newComment = '';
+      post.commentMedia = []; //Preview imgae
     },
     autoResize(event) {
       const el = event.target;
@@ -1620,13 +1758,43 @@ toggleComment(index) {
       const msgUrl = `https://www.messenger.com/dialog/send?link=${url}&app_id=${appId}&redirect_uri=${url}`;
       window.open(msgUrl, '_blank', 'width=600,height=600');
     },
-    handleOutsideClick(event) {
-      this.sharePopupRefs.forEach((refEl, index) => {
-        if (refEl && !refEl.contains(event.target)) {
-          this.posts[index].showShare = false;
-        }
-      });
+
+
+  // Outside Click
+   handleClickOutside(event) {
+      const wrapper = this.$refs.emojiWrapper;
+      if (wrapper && !wrapper.contains(event.target)) {
+        this.showEmojiPickerIndex = false;
+      }
     },
+
+
+    handleOutsideClick(event) {
+    // Close Emoji Picker
+    const emojiPickers = this.$refs.emojiPickerRefs || [];
+    if (!emojiPickers.some(ref => ref.contains(event.target))) {
+      this.showEmojiPickerIndex = false;
+    }
+
+    // Close Post Menu
+    const menus = this.$refs.postMenuRefs || [];
+    if (!menus.some(ref => ref.contains(event.target))) {
+      this.activeMenuIndex = null;
+    }
+
+    // Close Settings
+    const settings = this.$refs.settingsRef;
+    if (settings && !settings.contains(event.target)) {
+      this.showSettings = false;
+    }
+
+    // Close Share Popup
+    const sharePopup = this.$refs.sharePopupRef;
+    if (sharePopup && !sharePopup.contains(event.target)) {
+      this.showShareModal = false;
+    }
+  },
+
     
     OffComment(index) {
       this.posts[index].commentsDisabled = true;
@@ -1727,16 +1895,23 @@ toggleComment(index) {
       }
     },
   },
+
+
+
   mounted() {
+
     // this.listenRealtime();
+    document.addEventListener('click', this.handleClickOutside);
     this.posts = this.posts.map((post) => ({
       ...post,
       liked: false,
       isFollowing:false, //Follow post
       showComments: false,
       showShare: false,
+      
       newComment: '',
       commentsList: post.commentsList || [],
+      commentMedia: post.commentMedia || [],
       viewAll: false,
     }));
   },

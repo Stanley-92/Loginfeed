@@ -4,8 +4,8 @@ import router from './router'
 import './assets/tailwind.css'
 
 
+const app = createApp(App)
 
-// ✅ Only import Tailwind CSS here (use correct name)
-'@tailwindcss/postcss'  // or './assets/tailwind.css' if you named it that
+app.use(router)
 
-createApp(App).use(router).mount('#app')
+app.mount('#app')

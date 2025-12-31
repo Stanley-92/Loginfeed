@@ -1,186 +1,281 @@
 <template>
-  <div class="relative mb-1 w-full">
-    <!-- Comment Box -->
+  <div class="relative">
+    <!-- Main Comment Row -->
     <div
-      class="w-full border-l border-gray-300 p-2 rounded-xl items-center"
-      :style="{ marginLeft: depth > -2 ? `${depth}px` : '0px' }">
-      
-      <!-- Header User comment -->
-      <div class="flex items-start gap-3 mb-2">
-        <img :src="localComment.avatar" class="w-8 h-8 rounded-full" />
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-semibold">{{ localComment.user }}</p>
-          <p class="text-xs text-gray-400">{{ localComment.time || 'Just now' }}</p>
+      class="relative flex gap-3 mb-6"
+      :style="{ marginLeft: depth * 32 + 'px' }">
+      <!-- Curved  Line Connector -->
+      <div
+        v-if="depth > 0"
+        class="absolute pointer-events-none"
+        :style="{
+          left: '-18px',
+          top: '-148px',
+          width: '20px',
+          height: '178px',
+          borderLeft: '2px solid #93c5fd',
+          borderBottom: '2px solid #93c5fd',
+          borderBottomLeftRadius: '16px'
+        }"/>
+
+      <!-- Avatar -->
+      <img
+        :src="localComment.avatar"
+        alt="User avatar"
+        class="w-9 h-9 rounded-full object-cover flex-shrink-0 z-10 shadow-sm"/>
+
+<!-- Comment Body -->
+      <div class="flex-1 ">
+        <!-- Bubble -->
+        <div class="bg-gray-100 rounded-2xl px-4 py-3 shadow-sm">
+          <!-- Username -->
+          <p class="text-sm font-bold text-gray-900">
+            {{ localComment.user }}
+          </p>
+
+          <!-- Comment Text -->
+          <p class="text-sm text-gray-800 mt-1 whitespace-pre-wrap break-words">
+          {{ localComment.text }}
+          </p>
+
+
+          <!-- Time -->
+          <p class="text-xs text-gray-500 mt-2">
+          {{ localComment.time || 'Just now' }}
+          </p>
         </div>
-      </div>
 
-      <!-- Text or Editing and box reply Comment  -->
-      <div v-if="!isEditing">
-        <p class="text-sm px-4 py-2 text-gray-800 whitespace-pre-wrap break-words mb-2">
-        {{ localComment.text }}
-      </p>
-      </div>
-      <div v-else>
-        <textarea
-          v-model="editText"
-          class="flex-1 px-1  text-sm bg-white-400 rounded-full resize-none focus:outline-none focus:ring-2 focus:ring-white w-full"  
-          rows="2"
-          @input="autoResize">
-        </textarea>
-        <div class="flex gap-4 text-xs">
-          <button class="text-green-600 font-semibold" @click="saveEdit">Save</button>
-          <button class="text-gray-400" @click="cancelEdit">Cancel</button>
-        </div>
-      </div>
+        <!-- Actions -->
+        <div class="flex items-center gap-5 text-xs text-gray-600 mt-2 ml-3">
+          <button
+            @click="toggleLike"
+            class="flex items-center gap-1 hover:text-red-500 transition"
+            :class="{ 'text-red-500': localComment.liked }">
+            <Icon
+              :icon="localComment.liked ? 'solar:heart-bold' : 'solar:heart-linear'"
+              class="w-5 h-5"/>
 
 
-      
-      <!-- Post  Actions -->
-      <div class="flex gap-4 text-xs text-gray-500 mb-2">
-        <button @click="toggleLike" class="flex items-center gap-1 hover:text-red-500">
-        <Icon :icon="localComment.liked ? 'fluent-emoji-flat:broken-heart' : 'solar:heart-linear'" :class="['w-4 h-4', { 'text-red-500': localComment.liked }]" />
-         
-        </button>
-        <button @click="replyOpen = !replyOpen" class="flex items-center gap-1 hover:text-blue-500">
-          <Icon icon="basil:comment-outline" class="w-5 h-5" />
-          
-        </button>
-        <button @click="isEditing = true" class="flex items-center gap-1 hover:text-green-500">
-          <Icon icon="mdi:pencil-outline" class="w-4 h-4" />
-          <span class="font-semibold">Edit</span>
-        </button>
-      </div>
-
-      <!-- icon Confirm Delete -->
-      <div v-if="showDeleteConfirm" class="flex gap-3 text-xs text-red-600 mb-2"></div>
-
-      <!-- Reply Count -->
-      <div v-if="localComment.replies?.length" class="text-xs text-gray-400 ml-3 mb-2">
-      {{ countReplies(localComment.replies) }} {{ countReplies(localComment.replies) === 1 ? 'reply' : 'replies' }}
-      </div>
-
-
-      
-      <!-- Reply Input -->
-      <div v-if="replyOpen" class="mt-3 flex flex-col w-full">
-        <p class="text-xs text-gray-500 mb-2 ml-1">
-        <span class="font-semibold">{{ localComment.user }}</span>
-        </p>
-        <div class="relative flex items-center">
-          <textarea
-            v-model="replyText"
-            class="flex-1 px-4 py-2 text-sm bg-gray-100 rounded-full resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
-            placeholder="Write a reply..."
-            rows="1"
-            @input="autoResize"
-            @keyup.enter.exact="submitReply">
-          </textarea>
+            <span v-if="localComment.likes > 0" class="font-medium">
+              {{ localComment.likes }}
+            </span>
+            <span v-else>Like</span>
+          </button>
 
           <button
-            @click="submitReply"
-            class="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-700 disabled:text-gray-400"
-            :disabled="!replyText.trim()">
-            <Icon icon="famicons:paper-plane-outline" class="w-5 h-5" />
+            @click="replyOpen = !replyOpen"
+            class="hover:text-blue-600 transition">
+            Reply
           </button>
-        </div>
+
+
+          <button>
+          <Icon icon="bi:three-dots" class="w-5 h-5"/>
+          </button>
+
+          
+</div>
+          <!-- Show/Hide Replies Toggle -->
+    <div v-if="totalReplies > 0" class=" flex-1 ml-12  mb-3">
+      <button
+        @click="showReplies = !showReplies"
+        class="absolute text-xs font-medium text-gray-600 hover:underline transition">
+        {{ showReplies ? 'Hide' : 'View' }}
+        {{ totalReplies }}
+        {{ totalReplies === 1 ? 'reply' : 'replies' }}
+      </button>
+    </div>
+
+
+<!-- Reply Input Box -->
+        <transition name="fade">
+          <div v-if="replyOpen" class="mt-4">
+          
+            <div
+              class="flex items-center gap-3 bg-white border border-gray-200 rounded-full px-4 py-2 shadow-md">
+              
+            <button>
+            <Icon icon="solar:camera-broken" class="w-5 h-5"/>
+            </button>
+            <span class="text-blue-500 text-sm font-medium">
+                @{{ localComment.user }}
+              </span>
+              <input
+                v-model="replyText"
+                @keyup.enter="submitReply"
+                ref="replyInput"
+                class="flex-1 bg-transparent outline-none text-sm placeholder-gray-400"
+                placeholder="Write a reply..."/>
+              <button
+                @click="submitReply"
+                :disabled="!replyText.trim()"
+                class="text-blue-500 disabled:text-gray-300 transition">
+                <Icon icon="solar:paper-plane-bold" class="w-5 h-5" />
+              </button>
+<!---Iamge Upolod -->
+              <button>
+                <Icon icon="material-symbols-light:heart-smile-rounded" class="w-5 h-5"/>
+              </button>
+
+<!---Sent Button icon-->
+              <button>
+                <Icon icon="eva:paper-plane-fill" class="w-5 h-5"/>
+              </button>
+            </div>
+
+
+          </div>
+        </transition>
       </div>
+    </div>
 
+  
+    
 
-
-      <!-- Recursive Replies -->
-      <div v-if="localComment.replies?.length" class="mt-4 space-y-3 w-full mb-1">
+    <!-- Recursive Replies -->
+    <transition name="slide">
+      <div v-show="showReplies && totalReplies > 0">
         <CommentCard
-          v-for="(reply, i) in localComment.replies"
-          :key="i"
+          v-for="reply in localComment.replies"
+          :key="reply.id || reply.time"
           :comment="reply"
           :depth="depth + 1"
           :current-user="currentUser"
-          @reply-added="$emit('reply-added')"
-        />
+          @reply-added="onReplyAdded"/>
       </div>
-    </div>
+    </transition>
+    
   </div>
 </template>
 
 
 
 
-
-
-
-<script setup>
-import { ref } from 'vue'
+<script>
 import { Icon } from '@iconify/vue'
 import CommentCard from './CommentCard.vue'
 
-const emit = defineEmits(['reply-added'])
-const props = defineProps({
-  comment: Object,
-  depth: Number,
-  currentUser: Object
-})
+export default {
+  name: 'CommentCard',
+  components: {
+    Icon,
+    CommentCard,
+  },
+  props: {
+    comment: {
+      type: Object,
+      required: true
+    },
+    depth: {
+      type: Number,
+      default: 0
+    },
+    currentUser: {
+      type: Object,
+      required: true,
+    }
+  },
+  emits: ['reply-added'],
 
-const localComment = ref(JSON.parse(JSON.stringify(props.comment)))
-const replyOpen = ref(false)
-const replyText = ref('')
-const isEditing = ref(false)
-const editText = ref(localComment.value.text)
-const showDeleteConfirm = ref(false)
+  data() {
+    return {
+      localComment: null,
+      replyOpen: false,
+      replyText: '',
+      showReplies: true,
+    }
+  },
 
-const toggleLike = () => {
-  localComment.value.liked = !localComment.value.liked
-}
+  computed: {
+    totalReplies() {
+      return this.countReplies(this.localComment?.replies || [])
+    }
+  },
 
-const submitReply = () => {
-  const text = replyText.value.trim()
-  if (!text) return
+  created() {
+    // Deep copy to avoid mutating prop directly
+    this.localComment = JSON.parse(JSON.stringify(this.comment))
+  },
 
-  const reply = {
-    user: props.currentUser.name || 'You',
-    avatar: props.currentUser.avatar,
-    text,
-    liked: false,
-    time: 'Just now',
-    replies: [],
-  }
+  mounted() {
+    // Collapse deep threads
+    if (this.depth >= 3) {
+      this.showReplies = false
+    }
 
-  if (!Array.isArray(localComment.value.replies)) localComment.value.replies = []
+    // Auto-focus reply input
+    this.$watch('replyOpen', (isOpen) => {
+      if (isOpen) {
+        this.$nextTick(() => {
+          this.$refs.replyInput?.focus()
+        })
+      }
+    })
+  },
 
-  localComment.value.replies.push(reply)
-  replyText.value = '',
-  replyOpen.value = false
-  emit('reply-added')
-}
+  methods: {
+    countReplies(replies) {
+      if (!replies) return 0
+      return replies.reduce((sum, r) => sum + 1 + this.countReplies(r.replies), 0)
+    },
 
-const autoResize = (e) => {
-  e.target.style.height = 'auto'
-  e.target.style.height = '${e.target.scrollHeight}px'
-}
+    toggleLike() {
+      if (!this.localComment.likes) this.localComment.likes = 0
+      this.localComment.liked = !this.localComment.liked
+      this.localComment.likes += this.localComment.liked ? 1 : -1
+    },
 
-const saveEdit = () => {
-  localComment.value.text = editText.value.trim()
-  isEditing.value = false
-}
+    submitReply() {
+      const text = this.replyText.trim()
+      if (!text) return
 
-const cancelEdit = () => {
-  editText.value = localComment.value.text
-  isEditing.value = false
-}
+      const newReply = {
+        id: Date.now(),
+        user: this.currentUser.name,
+        avatar: this.currentUser.avatar,
+        text,
+        time: 'Just now',
+        likes: 0,
+        liked: false,
+        replies: []
+      }
 
-const countReplies = (replies) => {
-  let count = replies.length
-  for (const reply of replies) {
-    if (reply.replies?.length) {
-      count += countReplies(reply.replies)
+      if (!this.localComment.replies) this.localComment.replies = []
+      this.localComment.replies.push(newReply)
+
+      this.replyText = ''
+      this.replyOpen = false
+      this.showReplies = true
+      this.$emit('reply-added')
+    },
+
+    onReplyAdded() {
+      this.$emit('reply-added')
     }
   }
-  return count
 }
 </script>
 
 <style scoped>
-textarea {
-  overflow: hidden;
-  resize: none;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>
