@@ -7,7 +7,7 @@
       
       <!-- Header User comment -->
       <div class="flex items-start gap-3 mb-2">
-        <img :src="localComment.avatar" class="w-8 h-8 rounded-full" />
+        <img :src="localComment.avatar" class="w-8 h-8 rounded-full"/>
         <div class="flex-1 min-w-0">
           <p class="text-sm font-semibold">{{ localComment.user }}</p>
           <p class="text-xs text-gray-400">{{ localComment.time || 'Just now' }}</p>
