@@ -7,19 +7,18 @@
       </p>
 
       <!-- 6 Code Boxes -->
- <div class="flex justify-between gap-2 mb-4">
- <input
-  v-for="(d, i) in digits"
-  :key="i"
-  v-model="digits[i]"
-  ref="digitInputs"
-  maxlength="1"
-  type="text"
-  class="w-10 h-12 text-center border border-gray-300 rounded text-xl"
-  @input="moveFocus(i)"
-  @keydown="(e) => handleKeydown(e, i)"
-/>
-
+      <div class="flex justify-between gap-2 mb-4">
+        <input
+          v-for="(d, i) in digits"
+          :key="i"
+          v-model="digits[i]"
+          ref="digitInputs"
+          maxlength="1"
+          type="text"
+          class="w-10 h-12 text-center border border-gray-300 rounded text-xl"
+          @input="moveFocus(i)"
+          @keydown="(e) => handleKeydown(e, i)"
+        />
       </div>
 
       <p v-if="error" class="text-red-500 text-sm mb-3">{{ error }}</p>
@@ -41,65 +40,96 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
+<script>
+export default {
+  name: 'Verify',
 
-const router = useRouter()
-const contact = ref('')
-const digits = ref(['', '', '', '', '', ''])
-const digitInputs = ref([])
-const error = ref('')
+  data() {
+    return {
+      contact: '',
+      digits: ['', '', '', '', '', ''],
+      digitInputs: [],
+      error: ''
+    }
+  },
 
-// Get contact from localStorage
-onMounted(() => {
-  contact.value = localStorage.getItem('verifyEmail') || 'your contact'
-  nextTick(() => digitInputs.value[0]?.focus())
-})
+  mounted() {
+    // Get email from localStorage
+    this.contact = localStorage.getItem('verifyEmail') || ''
 
-// Move focus to next box
-function moveFocus(i) {
-  if (digits.value[i].length === 1 && i < 5) {
-    digitInputs.value[i + 1]?.focus()
+    // Focus first input
+    this.$nextTick(() => {
+      this.digitInputs = this.$refs.digitInputs
+      this.digitInputs[0]?.focus()
+    })
+  },
+
+  methods: {
+    moveFocus(i) {
+      if (this.digits[i].length === 1 && i < 5) {
+        this.digitInputs[i + 1]?.focus()
+      }
+    },
+
+    handleKeydown(e, i) {
+      if (e.key === 'Backspace' && !this.digits[i] && i > 0) {
+        this.digitInputs[i - 1]?.focus()
+      } else if (e.key === 'Enter') {
+        this.verifyCode()
+      }
+    },
+
+    async verifyCode() {
+      const fullCode = this.digits.join('')
+
+      if (!/^\d{6}$/.test(fullCode)) {
+        this.error = 'Code must be 6 digits.'
+        return
+      }
+
+      try {
+        const response = await fetch('http://localhost:3000/verify-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: this.contact, code: fullCode })
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          alert(' Verified successfully!')
+          this.$router.push('/feed')
+        } else {
+          this.error = result.message || 'Invalid code. Try again.'
+        }
+      } catch (err) {
+        console.error(err)
+        this.error = 'Server error. Please try again.'
+      }
+    },
+
+    async resendCode() {
+      try {
+        const res = await fetch('http://localhost:3000/send-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: this.contact })
+        })
+        const data = await res.json()
+
+        if (data.success) {
+          alert('📨 A new code was sent!')
+          this.digits = ['', '', '', '', '', '']
+          this.$nextTick(() => this.digitInputs[0]?.focus())
+          this.error = ''
+        } else {
+          this.error = data.message || 'Failed to resend code.'
+        }
+      } catch (err) {
+        console.error(err)
+        this.error = 'Server error. Please try again.'
+      }
+    }
   }
 }
-function handleKeydown(e, i) {
-  if (e.key === 'Backspace' && !digits.value[i] && i > 0) {
-    digitInputs.value[i - 1]?.focus()
-  } else if (e.key === 'Enter') {
-    verifyCode()
-  }
-}
-
-
-
-async function verifyCode() {
-  const fullCode = digits.value.join('')
-  
-  const response = await fetch('https://digit-backend-1b5i.onrender.com/verify-code', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: contact.value, code: fullCode })
-  })
-
-  const result = await response.json()
-
-  if (result.success) {
-    alert('✅ Verified!')
-    router.push('/profile')
-  } else {
-    error.value = 'Invalid code. Try again.'
-  }
-}
-
-function resendCode() {
-  fetch('https://digit-backend-1b5i.onrender.com/send-code', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: contact.value })
-  }).then(() => {
-    alert(' A new code was sent!')
-  })
-}
-
 </script>
