@@ -43,11 +43,11 @@
               class="w-5 h-5"/>
 
 
-            <span v-if="localComment.likes > 0" class="font-medium">
-              {{ localComment.likes }}
-            </span>
-            <span v-else>Like</span>
-          </button>
+      <span v-if="localComment.likes > 0" class="font-medium">
+      {{ localComment.likes }}
+      </span>
+      <span v-else>Like</span>
+      </button>
 
           <button
             @click="replyOpen = !replyOpen"
